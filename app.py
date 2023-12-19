@@ -59,27 +59,26 @@ async def read_sensor_data():
         yield read
 
 
-async def sensor_data_feed(websocket):
-    async for sensor_value in read_sensor_data():
-        await websocket.send(json.dumps({"sensorData": sensor_value, "type": "sensor"}))
-        # Check for a threshold and send a notification if met
-        if sensor_value > 80:
-            await websocket.send(
-                json.dumps({"thresholdExceeded": True, "type": "threshold"})
-            )
-        print("sent sensor data")
+# async def sensor_data_feed(websocket):
+#     async for sensor_value in read_sensor_data():
+#         await websocket.send(json.dumps({"sensorData": sensor_value, "type": "sensor"}))
+#         # Check for a threshold and send a notification if met
+#         if sensor_value > 80:
+#             await websocket.send(
+#                 json.dumps({"thresholdExceeded": True, "type": "threshold"})
+#             )
+#         print("sent sensor data")
 
 
 async def handler(websocket, _):
     try:
         # Start streaming video frames and sensor data concurrently
         video_task = asyncio.create_task(video_feed(websocket))
-        sensor_task = asyncio.create_task(sensor_data_feed(websocket))
+        # sensor_task = asyncio.create_task(sensor_data_feed(websocket))
         heartmonitor_task = asyncio.create_task(frecuency_feed(websocket))
         temp_task = asyncio.create_task(temperature_feed(websocket))
 
-        # Wait for either task to finish (e.g., if the WebSocket connection is closed)
-        await asyncio.gather(video_task, sensor_task, heartmonitor_task, temp_task)
+        await asyncio.gather(video_task, heartmonitor_task, temp_task)
     except websockets.exceptions.ConnectionClosed:
         pass  # Connection closed by the client
 
