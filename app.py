@@ -2,27 +2,19 @@
 
 import asyncio
 import websockets
-import cv2
-import base64
 import random
 import json
 
-camera = cv2.VideoCapture(0)
+import sys
 
+sys.path.append("/modules")
 
-async def generate_frames():
-    while True:
-        success, frame = camera.read()
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode(".jpg", frame)
-            frame_data = base64.b64encode(buffer).decode("utf-8")
-            yield frame_data
+from modules.video import generate_frames
+from modules.bpm import emulate_bpm_data
 
 
 async def video_feed(websocket):
-    frame_rate = 30  # Adjust the frame rate as needed
+    frame_rate = 30
     delay = 1 / frame_rate
     async for frame in generate_frames():
         await websocket.send(json.dumps({"frameData": frame, "type": "video"}))
@@ -31,11 +23,8 @@ async def video_feed(websocket):
 
 
 async def read_sensor_data():
-    while True:
-        # Replace this with actual sensor reading logic
-        sensor_value = random.uniform(0, 100)
-        await asyncio.sleep(0.2)  # Simulate sensor data being updated every second
-        yield sensor_value
+    async for read in emulate_bpm_data():
+        yield read
 
 
 async def sensor_data_feed(websocket):

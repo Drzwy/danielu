@@ -10,7 +10,7 @@
     <div id="sensorData"></div>
 
     <script>
-      const socket = new WebSocket("ws://192.168.1.188:8090"); // Replace with your WebSocket server address
+      const socket = new WebSocket("ws://192.168.1.81:8090"); // Replace with your WebSocket server address
 
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
