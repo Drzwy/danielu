@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Video Stream</title>
+  </head>
+  <body>
+    <img id="videoFrame" width="640" height="480" alt="Video Stream" />
+    <div id="sensorData"></div>
+
+    <script>
+      const socket = new WebSocket("ws://192.168.1.188:8090"); // Replace with your WebSocket server address
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        // Check if the message is video frame data
+        if (data.type === "video") {
+          const imageUrl = "data:image/jpeg;base64," + data.frameData;
+          document.getElementById("videoFrame").src = imageUrl;
+        }
+
+        // Check if the message is sensor data
+        if (data.type === "sensor") {
+          document.getElementById(
+            "sensorData"
+          ).innerText = `Sensor Data: ${data.sensorData}`;
+        }
+
+        // Check if the message indicates a threshold exceedance
+        if (data.type === "threshold" && data.thresholdExceeded) {
+          document.getElementById("sensorData").innerText +=
+            "\nThreshold Exceeded!";
+        }
+      };
+
+      socket.onclose = (event) => {
+        console.error("WebSocket closed:", event);
+      };
+
+      socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+    </script>
+  </body>
+</html>
