@@ -1,16 +1,11 @@
 #!/usr/bin/env python
 
+from modules.bpm import emulate_bpm_data
+from modules.video import generate_frames
 import asyncio
 import websockets
 import random
 import json
-
-import sys
-
-sys.path.append("/modules")
-
-from modules.video import generate_frames
-from modules.bpm import emulate_bpm_data
 
 
 async def video_feed(websocket):
