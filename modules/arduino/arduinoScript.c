@@ -3,7 +3,7 @@
 const int sensorPin = A0;
 
 void setup() {
-  Serial.begin(9600);  // Configura la velocidad de la conexión serial
+  Serial.begin(115200);  // Configura la velocidad de la conexión serial
 }
 
 void loop() {
