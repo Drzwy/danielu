@@ -32,9 +32,7 @@ void setup() {
   pulseSensor.setThreshold(Threshold);   
 
   // Double-check the "pulseSensor" object was created and "began" seeing a signal. 
-   if (pulseSensor.begin()) {
-    Serial.println("We created a pulseSensor Object !");  //This prints one time at Arduino power-up,  or on Arduino reset.  
-  }
+  pulseSensor.begin();
 }
 
 
