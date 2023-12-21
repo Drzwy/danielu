@@ -68,22 +68,19 @@ def is_valid_data(data):
     try:
         decoded_data = data.decode('utf-8')
         value = decoded_data
+        value = int(value)
         return value
-        # return 0 <= value <= 100  # Ajusta el rango según sea necesario
     except (UnicodeDecodeError, ValueError):
         return False  # Los datos no son válidos o no se pueden decodificar como un entero
-
-def scale_value(value):
-    scaled_value = (value * 16) // 128
-    return scaled_value
 
 
 if __name__ == "__main__":
     try:
         arduino_port = find_arduino_port()
         print(f"Arduino found on port: {arduino_port}")
+        arduino = connect_to_arduino(arduino_port, 9600)
+        print('este es el arduino: ',arduino.read)
 
-        arduino = connect_to_arduino(arduino_port, 115200)
 
         try:
             readCount = 0 
@@ -93,26 +90,13 @@ if __name__ == "__main__":
                 readCount+=1
 
                 if not read:
-                    print('invalid data')
-                    continue
-
-                try:
-                    read = int(read)
-                except ValueError:
+                    # print('invalid data')
                     continue
                 
-                print(f'{readCount}', end='')
-                read = scale_value(read)
-          
-                print(f": {read}", end='')
-                if (abs(mean - read) < 3):
-                    print()
-                else:
-                    print('ALERTA CAMBIO BRUSCO')
-                # Your code to read and process data from Arduino goes here
-                # For example, you can read a line of data
-                #print(f"Read {readCount}: {line}")
-                #time.sleep(0.01)  # Adjust the delay as needed
+                print(f"{readCount}: {read}")
+                
+                # time.sleep(0.02)  # Adjust the delay as needed.
+            
         except KeyboardInterrupt:
             print("Program terminated manually")
 
