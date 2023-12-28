@@ -47,6 +47,7 @@ import serial
 import time
 import math
 
+
 def find_arduino_port():
     arduino_ports = [
         p.device
@@ -60,15 +61,16 @@ def find_arduino_port():
         print("Multiple Arduinos found - using the first one")
     return arduino_ports[0]
 
+
 def connect_to_arduino(port, baud_rate):
-    ser = serial.Serial(port, baud_rate, timeout=1)
-    return ser
+    serialConnection = serial.Serial(port, baud_rate, timeout=1)
+    return serialConnection
+
 
 def is_valid_data(data):
     try:
         decoded_data = data.decode('utf-8')
         value = decoded_data
-        value = int(value)
         return value
     except (UnicodeDecodeError, ValueError):
         return False  # Los datos no son válidos o no se pueden decodificar como un entero
@@ -79,24 +81,23 @@ if __name__ == "__main__":
         arduino_port = find_arduino_port()
         print(f"Arduino found on port: {arduino_port}")
         arduino = connect_to_arduino(arduino_port, 9600)
-        print('este es el arduino: ',arduino.read)
-
+        print('este es el arduino: ', arduino.read)
 
         try:
-            readCount = 0 
+            readCount = 0
             mean = 64
             while True:
                 read = is_valid_data(arduino.readline())
-                readCount+=1
+                readCount += 1
 
                 if not read:
                     # print('invalid data')
                     continue
-                
+
                 print(f"{readCount}: {read}")
-                
+
                 # time.sleep(0.02)  # Adjust the delay as needed.
-            
+
         except KeyboardInterrupt:
             print("Program terminated manually")
 

@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 
-from modules.bpm import emulate_bpm_data
+from modules.emulate_bpm import emulate_bpm_data
 from modules.video import generate_frames
 from modules.temp import read_temp
 from modules.heartmonitor import read_frec
+from modules.bpm import read_bpm
 
 import asyncio
 import websockets
 import random
 import json
+from interval import interval
 
+
+BPM_TRESHOLD = 
 
 async def video_feed(websocket):
     frame_rate = 30
@@ -54,9 +58,16 @@ async def temperature_feed(websocket):
                 json.dumps({"hipotermia": True, "type": "alerta_hipotermia"}))
 
 
-async def read_sensor_data():
-    async for read in emulate_bpm_data():
-        yield read
+async def bpm_feed(websocket):
+    async for bpm_read in read_bpm:
+        packedData = json.dumps({'bpm': bpm_read})
+        await websocket.send(packedData)
+        if read_bpm
+
+
+# async def read_sensor_data():
+#     async for read in emulate_bpm_data():
+#         yield read
 
 
 # async def sensor_data_feed(websocket):
