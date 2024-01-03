@@ -12,11 +12,11 @@ async def generate_frames():
         if not success:
             continue
         else:
-            # ret, buffer = cv2.imencode(".jpg", frame)
-            # frame_data = base64.b64encode(buffer).decode("utf-8")
-            # yield frame_data
-            yield frame
-
+            ret, buffer = cv2.imencode(".jpg", frame)
+            frame_data = base64.b64encode(buffer).decode("utf-8")
+            yield frame_data
+            # yield frame
+    
 
 async def main():
     async for frame in generate_frames():

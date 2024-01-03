@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # from modules.emulate_bpm import emulate_bpm_data
+import socket
 from modules.video import generate_frames
 # from modules.temp import read_temp
 # from modules.heartmonitor import read_frec
@@ -11,6 +12,18 @@ import asyncio
 import websockets
 import json
 
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.254.254.254', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
 class InputChunkProtocol(asyncio.Protocol):
     def connection_made(self, transport):
@@ -72,19 +85,19 @@ async def video_feed(websocket):
         print("camera data sent")
         await asyncio.sleep(delay)
 
+    print('stopped video')
+    return True
 
 active = {'bpm': False, 'video': False}
 
 
 async def handler(websocket, _):
-    initialized = False
 
-    if not initialized:
-        video_task = asyncio.create_task(
-            video_feed(websocket))
+    video_task = asyncio.create_task(
+        video_feed(websocket))
 
-        heartmonitor_task = asyncio.create_task(
-            bpm_feed(websocket))
+    heartmonitor_task = asyncio.create_task(
+        bpm_feed(websocket))
 
     # done, pending =  await asyncio.wait(
     #     [video_task, heartmonitor_task],
@@ -92,7 +105,8 @@ async def handler(websocket, _):
     # )
     # for task in pending:
     #     task.cancel()
-    await asyncio.gather(video_task, heartmonitor_task)
+    
+    # await asyncio.gather(video_task, heartmonitor_task)
 
     order = await websocket.recv()
     print(f'{order}: {type(order)}')
@@ -100,6 +114,7 @@ async def handler(websocket, _):
     if active["bpm"] and order == 'close_bpm':
         active["bpm"] = False
     elif not active['bpm'] and order == 'open_bpm':
+        res = await heartmonitor_task
         active["bpm"] = True
     elif active["video"] and order == 'close_video':
         active["video"] = False
@@ -109,7 +124,7 @@ async def handler(websocket, _):
 
 
 async def main():
-    async with websockets.serve(handler, "192.168.175.124", 8090):
+    async with websockets.serve(handler, get_ip(), 8090):
         await asyncio.Future()  # run forever
 
 
